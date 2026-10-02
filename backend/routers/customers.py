@@ -12,12 +12,19 @@ router = APIRouter(
 )
 
 
+# =========================================================
 # CREATE CUSTOMER
-@router.post("/", response_model=CustomerResponse)
+# =========================================================
+
+@router.post(
+    "/",
+    response_model=CustomerResponse
+)
 def create_customer(
     customer: CustomerCreate,
     db: Session = Depends(get_db)
 ):
+
     existing_customer = (
         db.query(Customer)
         .filter(Customer.email == customer.email)
@@ -44,22 +51,67 @@ def create_customer(
     return new_customer
 
 
+# =========================================================
 # GET ALL CUSTOMERS
-@router.get("/", response_model=list[CustomerResponse])
+# =========================================================
+
+@router.get(
+    "/",
+    response_model=list[CustomerResponse]
+)
 def get_customers(
     db: Session = Depends(get_db)
 ):
-    customers = db.query(Customer).all()
+
+    customers = (
+        db.query(Customer)
+        .all()
+    )
 
     return customers
 
 
+# =========================================================
+# GET CUSTOMER BY EMAIL
+# =========================================================
+
+@router.get(
+    "/email/{email}",
+    response_model=CustomerResponse
+)
+def get_customer_by_email(
+    email: str,
+    db: Session = Depends(get_db)
+):
+
+    customer = (
+        db.query(Customer)
+        .filter(Customer.email == email)
+        .first()
+    )
+
+    if not customer:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found"
+        )
+
+    return customer
+
+
+# =========================================================
 # GET CUSTOMER BY ID
-@router.get("/{customer_id}", response_model=CustomerResponse)
+# =========================================================
+
+@router.get(
+    "/{customer_id}",
+    response_model=CustomerResponse
+)
 def get_customer(
     customer_id: int,
     db: Session = Depends(get_db)
 ):
+
     customer = (
         db.query(Customer)
         .filter(Customer.id == customer_id)
@@ -75,13 +127,20 @@ def get_customer(
     return customer
 
 
+# =========================================================
 # UPDATE CUSTOMER
-@router.put("/{customer_id}", response_model=CustomerResponse)
+# =========================================================
+
+@router.put(
+    "/{customer_id}",
+    response_model=CustomerResponse
+)
 def update_customer(
     customer_id: int,
     customer: CustomerCreate,
     db: Session = Depends(get_db)
 ):
+
     existing_customer = (
         db.query(Customer)
         .filter(Customer.id == customer_id)
@@ -120,12 +179,16 @@ def update_customer(
     return existing_customer
 
 
+# =========================================================
 # DELETE CUSTOMER
+# =========================================================
+
 @router.delete("/{customer_id}")
 def delete_customer(
     customer_id: int,
     db: Session = Depends(get_db)
 ):
+
     existing_customer = (
         db.query(Customer)
         .filter(Customer.id == customer_id)

@@ -178,3 +178,304 @@
   background: #047857;
   border-color: #047857;
 }
+
+
+
+
+/* =========================
+   READY TO ORDER CTA
+========================= */
+
+.cta-section {
+  width: 90%;
+  max-width: 1400px;
+  height: 430px;
+  margin: 70px auto;
+
+  border-radius: 28px;
+  overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-overlay {
+  width: 100%;
+  height: 100%;
+
+  background: rgba(3, 45, 32, 0.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-content {
+  width: 90%;
+  max-width: 750px;
+
+  text-align: center;
+  color: #ffffff;
+}
+
+.cta-content h2 {
+  margin: 0 0 18px;
+
+  color: #ffffff;
+
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.cta-content h2 span {
+  display: block;
+
+  color: #10B981;
+
+  font-size: 52px;
+  font-weight: 900;
+}
+
+.cta-content p {
+  margin: 0 0 30px;
+
+  color: #ECFDF5;
+
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.cta-order-button {
+  display: inline-block;
+
+  padding: 14px 32px;
+
+  background: #10B981;
+  color: #ffffff;
+
+  border-radius: 30px;
+
+  text-decoration: none;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  transition: 0.3s ease;
+}
+
+.cta-order-button:hover {
+  background: #34D399;
+  color: #ffffff;
+  transform: translateY(-3px);
+}
+
+.cta-order-button {
+  display: inline-block;
+  padding: 14px 32px;
+  background: #10B981;
+  color: #ffffff;
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.cta-order-button:hover {
+  background: #34D399;
+  color: #ffffff;
+  transform: translateY(-3px);
+}
+
+
+/* ORDER NOW BUTTON */
+.cta-section .cta-order-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  padding: 15px 35px !important;
+
+  background: #10B981 !important;
+  color: #ffffff !important;
+
+  border: none !important;
+  border-radius: 30px !important;
+
+  text-decoration: none !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+
+  transition: all 0.3s ease;
+}
+
+.cta-section .cta-order-button:hover {
+  background: #047857 !important;
+  color: #ffffff !important;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+
+/* =========================
+   NAVBAR LOGOUT BUTTON
+========================= */
+
+.nav-logout-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 18px !important;
+
+  background: #DC2626 !important;
+  color: #ffffff !important;
+
+  border: none !important;
+  border-radius: 8px !important;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+.nav-logout-button:hover {
+  background: #B91C1C !important;
+  color: #ffffff !important;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================
+   FIXED NAVBAR - FINAL
+========================= */
+
+.navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+
+  width: 100% !important;
+  height: 75px !important;
+
+  z-index: 10000 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Navbar inner container */
+.navbar-container {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+/* Prevent content from going behind navbar */
+#root {
+  padding-top: 75px;
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   LOGOUT BUTTON
+========================= */
+
+.nav-logout-button {
+  background: #DC2626 !important;
+  color: #FFFFFF !important;
+
+  border: none !important;
+  border-radius: 8px !important;
+
+  padding: 10px 18px !important;
+
+  font-size: 15px !important;
+  font-weight: 600 !important;
+
+  cursor: pointer !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  transition: all 0.3s ease !important;
+}
+
+.nav-logout-button:hover {
+  background: #B91C1C !important;
+  color: #FFFFFF !important;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================
+   NAVBAR LINKS
+========================= */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+
+/* =========================
+   MOBILE NAVBAR
+========================= */
+
+@media (max-width: 768px) {
+
+  .navbar {
+    height: 70px !important;
+  }
+
+  #root {
+    padding-top: 70px;
+  }
+
+  .navbar-links {
+    position: absolute;
+
+    top: 70px;
+    left: 0;
+
+    width: 100%;
+
+    display: none;
+
+    flex-direction: column;
+    align-items: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+  }
+
+  .navbar-links.mobile-menu-open {
+    display: flex;
+  }
+}
+

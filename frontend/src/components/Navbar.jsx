@@ -203,17 +203,25 @@ function Navbar({ darkMode, setDarkMode }) {
 
 
               <button
-                onClick={handleLogout}
-                className="nav-logout-button"
-              >
-
-                <LogOut size={18} />
-
-                <span>
-                  Logout
-                </span>
-
-              </button>
+  onClick={handleLogout}
+  className="nav-logout-button"
+  style={{
+    backgroundColor: "#04220f",
+    color: "#FFFFFF",
+    border: "none",
+    padding: "10px 18px",
+    borderRadius: "8px",
+    fontWeight: "600",
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+  }}
+>
+  <LogOut size={18} />
+  <span>Logout</span>
+</button>
 
             </>
           )}
@@ -226,7 +234,7 @@ function Navbar({ darkMode, setDarkMode }) {
           {!loggedIn && (
             <>
 
-              <Link
+        <Link
                 to="/"
                 onClick={closeMenu}
               >

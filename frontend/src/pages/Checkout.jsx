@@ -1,7 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+
+const API_URL = "http://127.0.0.1:8001";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -17,15 +18,25 @@ function Checkout() {
 
   const [loading, setLoading] = useState(false);
 
-  // Get logged-in user
+  // =====================================================
+  // LOGGED-IN USER
+  // =====================================================
+
   const loggedInUser = JSON.parse(
     localStorage.getItem("user") || "null"
   );
 
-  // Customer-specific cart key
+  // =====================================================
+  // CUSTOMER CART KEY
+  // =====================================================
+
   const cartKey = loggedInUser?.id
     ? `cart_user_${loggedInUser.id}`
     : "cart";
+
+  // =====================================================
+  // LOAD CART + USER DETAILS
+  // =====================================================
 
   useEffect(() => {
     console.log("CHECKOUT USER:", loggedInUser);
@@ -48,6 +59,10 @@ function Checkout() {
     }
   }, [cartKey]);
 
+  // =====================================================
+  // HANDLE INPUT
+  // =====================================================
+
   const handleChange = (e) => {
     setCustomer({
       ...customer,
@@ -55,25 +70,55 @@ function Checkout() {
     });
   };
 
+  // =====================================================
+  // TOTAL
+  // =====================================================
+
   const total = cart.reduce(
     (sum, item) =>
-      sum + Number(item.price) * item.quantity,
+      sum +
+      Number(item.price) * Number(item.quantity),
     0
   );
+
+  // =====================================================
+  // PLACE ORDER
+  // =====================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("PLACE ORDER CART:", cart);
-    console.log(
-      "PLACE ORDER STORAGE:",
-      localStorage.getItem(cartKey)
-    );
+    console.log("================================");
+    console.log("PLACE ORDER STARTED");
+    console.log("================================");
+
+    console.log("LOGGED USER:", loggedInUser);
+    console.log("CUSTOMER FORM:", customer);
+    console.log("CART:", cart);
+    console.log("TOTAL:", total);
+
+    // ===================================================
+    // CART CHECK
+    // ===================================================
 
     if (cart.length === 0) {
       alert("Your cart is empty.");
       return;
     }
+
+    // ===================================================
+    // LOGIN CHECK
+    // ===================================================
+
+    if (!loggedInUser?.id || !loggedInUser?.email) {
+      alert("Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    // ===================================================
+    // CUSTOMER DETAILS CHECK
+    // ===================================================
 
     if (
       !customer.name.trim() ||
@@ -88,119 +133,282 @@ function Checkout() {
     try {
       setLoading(true);
 
-      if (!loggedInUser?.id || !loggedInUser?.email) {
-        alert(
-          "Customer account not found. Please login again."
-        );
+      // =================================================
+      // STEP 1
+      // FIND CUSTOMER
+      // =================================================
 
-        navigate("/login");
-        return;
-      }
+      const loginEmail = loggedInUser.email
+        .trim()
+        .toLowerCase();
 
-      /*
-        Find correct Customer table ID
-        using logged-in user's email
-      */
+      console.log(
+        "Looking for customer:",
+        loginEmail
+      );
+
       const customerResponse = await axios.get(
-        "http://127.0.0.1:8001/customers/"
+        `${API_URL}/customers/`
       );
 
-      const customers = customerResponse.data || [];
+      const customers = Array.isArray(
+        customerResponse.data
+      )
+        ? customerResponse.data
+        : [];
 
-      const foundCustomer = customers.find(
+      console.log(
+        "ALL CUSTOMERS:",
+        customers
+      );
+
+      let foundCustomer = customers.find(
         (item) =>
-          item.email?.toLowerCase().trim() ===
-          loggedInUser.email?.toLowerCase().trim()
+          item.email?.trim().toLowerCase() ===
+          loginEmail
       );
+
+      // =================================================
+      // STEP 2
+      // IF CUSTOMER DOES NOT EXIST
+      // CREATE AUTOMATICALLY
+      // =================================================
 
       if (!foundCustomer) {
+        console.log(
+          "Customer not found."
+        );
+
+        console.log(
+          "Creating customer automatically..."
+        );
+
+        const newCustomerData = {
+          name: customer.name.trim(),
+          email: loggedInUser.email.trim(),
+          phone: customer.phone.trim(),
+          address: customer.address.trim(),
+        };
+
+        console.log(
+          "NEW CUSTOMER DATA:",
+          newCustomerData
+        );
+
+        const createCustomerResponse =
+          await axios.post(
+            `${API_URL}/customers/`,
+            newCustomerData
+          );
+
+        foundCustomer =
+          createCustomerResponse.data;
+
+        console.log(
+          "NEW CUSTOMER CREATED:",
+          foundCustomer
+        );
+      }
+
+      // =================================================
+      // STEP 3
+      // CUSTOMER ID
+      // =================================================
+
+      if (!foundCustomer?.id) {
         alert(
-          "Customer details not found. Please register again."
+          "Unable to create customer record."
         );
         return;
       }
 
-      const customerId = foundCustomer.id;
+      const customerId =
+        foundCustomer.id;
 
-      /*
-        Prepare order items
-      */
-      const orderItems = cart.map((item) => ({
-        food_id: item.id,
-        quantity: item.quantity,
-        unit_price: Number(item.price),
-        subtotal:
-          Number(item.price) * item.quantity,
-      }));
-
-      /*
-        Create order
-      */
-      const orderResponse = await axios.post(
-        "http://127.0.0.1:8001/orders/",
-        {
-          customer_id: customerId,
-          total_amount: total,
-          items: orderItems,
-        }
+      console.log(
+        "CUSTOMER ID:",
+        customerId
       );
 
-      /*
-        Save order for confirmation page
-      */
+      // =================================================
+      // STEP 4
+      // UPDATE CUSTOMER DETAILS
+      // =================================================
+
+      try {
+        const updatedCustomer =
+          await axios.put(
+            `${API_URL}/customers/${customerId}`,
+            {
+              name: customer.name.trim(),
+              email: foundCustomer.email,
+              phone: customer.phone.trim(),
+              address: customer.address.trim(),
+            }
+          );
+
+        console.log(
+          "CUSTOMER UPDATED:",
+          updatedCustomer.data
+        );
+
+      } catch (updateError) {
+        console.log(
+          "Customer update warning:",
+          updateError.response?.data ||
+            updateError.message
+        );
+      }
+
+      // =================================================
+      // STEP 5
+      // PREPARE ORDER ITEMS
+      // =================================================
+
+      const orderItems = cart.map(
+        (item) => ({
+          food_id: Number(item.id),
+          quantity: Number(item.quantity),
+          unit_price: Number(item.price),
+          subtotal:
+            Number(item.price) *
+            Number(item.quantity),
+        })
+      );
+
+      console.log(
+        "ORDER ITEMS:",
+        orderItems
+      );
+
+      // =================================================
+      // STEP 6
+      // ORDER DATA
+      // =================================================
+
+      const orderData = {
+        customer_id: Number(customerId),
+        total_amount: Number(total),
+        items: orderItems,
+      };
+
+      console.log(
+        "ORDER DATA:",
+        orderData
+      );
+
+      // =================================================
+      // STEP 7
+      // CREATE ORDER
+      // =================================================
+
+      const orderResponse =
+        await axios.post(
+          `${API_URL}/orders/`,
+          orderData
+        );
+
+      console.log(
+        "ORDER CREATED:",
+        orderResponse.data
+      );
+
+      // =================================================
+      // STEP 8
+      // SAVE LAST ORDER
+      // =================================================
+
       localStorage.setItem(
         "lastOrder",
         JSON.stringify({
           order: orderResponse.data,
-          customer: customer,
+          customer: {
+            ...customer,
+            email: foundCustomer.email,
+          },
           items: cart,
           total: total,
         })
       );
 
-      /*
-        Clear this customer's cart
-      */
+      // =================================================
+      // STEP 9
+      // CLEAR CART
+      // =================================================
+
       localStorage.removeItem(cartKey);
 
       setCart([]);
 
-      /*
-        Go to confirmation page
-      */
+      // =================================================
+      // STEP 10
+      // ORDER CONFIRMATION
+      // =================================================
+
       navigate("/order-confirmation");
 
     } catch (error) {
       console.error(
-        "Order error:",
-        error.response?.data || error.message
+        "================================"
+      );
+
+      console.error(
+        "ORDER ERROR:",
+        error
+      );
+
+      console.error(
+        "BACKEND ERROR:",
+        error.response?.data
+      );
+
+      console.error(
+        "STATUS:",
+        error.response?.status
+      );
+
+      console.error(
+        "================================"
       );
 
       alert(
         error.response?.data?.detail ||
-        "Failed to place order."
+        "Failed to place order. Please try again."
       );
+
     } finally {
       setLoading(false);
     }
   };
 
+  // =====================================================
+  // UI
+  // =====================================================
+
   return (
     <main className="checkout-page">
 
+      {/* CHECKOUT HEADER */}
+
       <section className="checkout-header">
+
         <div className="container">
 
           <p>CHECKOUT</p>
 
-          <h1>Complete Your Order</h1>
+          <h1>
+            Complete Your Order
+          </h1>
 
           <span>
             Enter your details and review your order.
           </span>
 
         </div>
+
       </section>
+
+      {/* CHECKOUT SECTION */}
 
       <section className="checkout-section">
 
@@ -208,17 +416,23 @@ function Checkout() {
 
           <div className="checkout-layout">
 
-            {/* CUSTOMER FORM */}
+            {/* CUSTOMER INFORMATION */}
 
             <div className="checkout-form-card">
 
-              <h2>Customer Information</h2>
+              <h2>
+                Customer Information
+              </h2>
 
               <form onSubmit={handleSubmit}>
 
+                {/* NAME */}
+
                 <div className="form-group">
 
-                  <label>Full Name</label>
+                  <label>
+                    Full Name
+                  </label>
 
                   <input
                     type="text"
@@ -230,9 +444,13 @@ function Checkout() {
 
                 </div>
 
+                {/* EMAIL */}
+
                 <div className="form-group">
 
-                  <label>Email</label>
+                  <label>
+                    Email
+                  </label>
 
                   <input
                     type="email"
@@ -244,9 +462,13 @@ function Checkout() {
 
                 </div>
 
+                {/* PHONE */}
+
                 <div className="form-group">
 
-                  <label>Phone</label>
+                  <label>
+                    Phone
+                  </label>
 
                   <input
                     type="text"
@@ -258,9 +480,13 @@ function Checkout() {
 
                 </div>
 
+                {/* ADDRESS */}
+
                 <div className="form-group">
 
-                  <label>Address</label>
+                  <label>
+                    Address
+                  </label>
 
                   <textarea
                     name="address"
@@ -272,10 +498,11 @@ function Checkout() {
 
                 </div>
 
+                {/* PLACE ORDER */}
+
                 <button
-                  type="button"
+                  type="submit"
                   className="place-order-button"
-                  onClick={handleSubmit}
                   disabled={loading}
                 >
                   {loading
@@ -291,13 +518,17 @@ function Checkout() {
 
             <div className="checkout-summary">
 
-              <h2>Order Summary</h2>
+              <h2>
+                Order Summary
+              </h2>
 
               {cart.length === 0 ? (
 
                 <div className="checkout-empty">
 
-                  <p>Your cart is empty.</p>
+                  <p>
+                    Your cart is empty.
+                  </p>
 
                   <Link to="/foods">
                     Explore Foods
@@ -334,7 +565,7 @@ function Checkout() {
                         <strong>
                           Rs.{" "}
                           {Number(item.price) *
-                            item.quantity}
+                            Number(item.quantity)}
                         </strong>
 
                       </div>
@@ -347,7 +578,9 @@ function Checkout() {
 
                   <div className="checkout-total">
 
-                    <span>Total</span>
+                    <span>
+                      Total
+                    </span>
 
                     <strong>
                       Rs. {total}
