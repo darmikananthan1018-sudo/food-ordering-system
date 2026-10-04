@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import FoodCard from "../components/FoodCard";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Foods() {
   const [foods, setFoods] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -20,7 +22,7 @@ function Foods() {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8001/categories/"
+        `${API_URL}/categories/`
       );
 
       setCategories(response.data);
@@ -48,7 +50,7 @@ function Foods() {
       }
 
       const response = await axios.get(
-        "http://127.0.0.1:8001/foods/",
+        `${API_URL}/foods/`,
         {
           params: params,
         }
@@ -96,7 +98,6 @@ function Foods() {
         </div>
       </section>
 
-
       {/* Search & Filter */}
       <section className="food-filter-section">
         <div className="container">
@@ -139,7 +140,6 @@ function Foods() {
 
         </div>
       </section>
-
 
       {/* Foods */}
       <section className="foods-section">

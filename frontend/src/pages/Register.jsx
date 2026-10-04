@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -6,8 +5,10 @@ import {
   UserPlus,
   User,
   Mail,
-  Lock
+  Lock,
 } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Register() {
   const navigate = useNavigate();
@@ -15,7 +16,6 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -52,12 +52,12 @@ function Register() {
       setLoading(true);
 
       await axios.post(
-        "http://127.0.0.1:8001/auth/register",
+        `${API_URL}/auth/register`,
         {
           name: cleanName,
           email: cleanEmail,
           password: cleanPassword,
-          role: "Customer"
+          role: "Customer",
         }
       );
 
@@ -84,7 +84,7 @@ function Register() {
         );
       } else if (!error.response) {
         alert(
-          "Cannot connect to backend. Please make sure FastAPI is running on port 8001."
+          "Cannot connect to backend."
         );
       } else {
         alert(
@@ -92,7 +92,6 @@ function Register() {
           "Registration failed. Please try again."
         );
       }
-
     } finally {
       setLoading(false);
     }
@@ -100,7 +99,6 @@ function Register() {
 
   return (
     <main className="register-page">
-
       <div className="register-card">
 
         <div className="register-icon">
@@ -120,11 +118,9 @@ function Register() {
         <form onSubmit={handleSubmit}>
 
           <div className="register-form-group">
-
             <label>Name</label>
 
             <div className="register-input-wrapper">
-
               <User size={19} />
 
               <input
@@ -136,18 +132,13 @@ function Register() {
                 }
                 required
               />
-
             </div>
-
           </div>
 
-
           <div className="register-form-group">
-
             <label>Email Address</label>
 
             <div className="register-input-wrapper">
-
               <Mail size={19} />
 
               <input
@@ -159,18 +150,13 @@ function Register() {
                 }
                 required
               />
-
             </div>
-
           </div>
 
-
           <div className="register-form-group">
-
             <label>Password</label>
 
             <div className="register-input-wrapper">
-
               <Lock size={19} />
 
               <input
@@ -182,11 +168,8 @@ function Register() {
                 }
                 required
               />
-
             </div>
-
           </div>
-
 
           <button
             type="submit"
@@ -200,9 +183,7 @@ function Register() {
 
         </form>
 
-
         <p className="register-login-text">
-
           Already have an account?{" "}
 
           <button
@@ -211,14 +192,11 @@ function Register() {
           >
             Login
           </button>
-
         </p>
 
       </div>
-
     </main>
   );
 }
 
 export default Register;
-

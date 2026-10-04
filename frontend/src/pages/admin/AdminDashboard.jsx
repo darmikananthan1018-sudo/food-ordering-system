@@ -31,7 +31,7 @@ function AdminDashboard() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        "http://127.0.0.1:8001/admin/dashboard",
+        `${API_URL}/admin/dashboard`,
         {
           headers: {
             Authorization: `Bearer ${token}`

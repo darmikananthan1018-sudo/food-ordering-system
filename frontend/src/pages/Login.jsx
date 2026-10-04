@@ -1,8 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { LogIn, Mail, Lock, UserPlus } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Login() {
   const navigate = useNavigate();
@@ -22,8 +23,7 @@ function Login() {
       return;
     }
 
-    const emailPattern =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(cleanEmail)) {
       alert("Please enter a valid email address.");
@@ -39,18 +39,16 @@ function Login() {
       formData.append("password", cleanPassword);
 
       const loginResponse = await axios.post(
-        "http://127.0.0.1:8001/auth/login",
+        `${API_URL}/auth/login`,
         formData,
         {
           headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
 
-      const token =
-        loginResponse.data.access_token;
+      const token = loginResponse.data.access_token;
 
       if (!token) {
         alert("Login failed. No access token received.");
@@ -60,7 +58,7 @@ function Login() {
       localStorage.setItem("token", token);
 
       const userResponse = await axios.get(
-        "http://127.0.0.1:8001/auth/me",
+        `${API_URL}/auth/me`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -100,7 +98,7 @@ function Login() {
         );
       } else if (!error.response) {
         alert(
-          "Cannot connect to backend. Please make sure FastAPI is running on port 8001."
+          "Cannot connect to backend."
         );
       } else {
         alert(
@@ -116,7 +114,6 @@ function Login() {
 
   return (
     <main className="login-page">
-
       <div className="login-card">
 
         <div className="login-icon">
@@ -136,11 +133,9 @@ function Login() {
         <form onSubmit={handleSubmit}>
 
           <div className="login-form-group">
-
             <label>Email Address</label>
 
             <div className="login-input-wrapper">
-
               <Mail size={19} />
 
               <input
@@ -152,18 +147,13 @@ function Login() {
                 }
                 required
               />
-
             </div>
-
           </div>
 
-
           <div className="login-form-group">
-
             <label>Password</label>
 
             <div className="login-input-wrapper">
-
               <Lock size={19} />
 
               <input
@@ -175,11 +165,8 @@ function Login() {
                 }
                 required
               />
-
             </div>
-
           </div>
-
 
           <button
             type="submit"
@@ -192,7 +179,6 @@ function Login() {
           </button>
 
         </form>
-
 
         <div className="login-register-section">
 
@@ -212,7 +198,6 @@ function Login() {
         </div>
 
       </div>
-
     </main>
   );
 }

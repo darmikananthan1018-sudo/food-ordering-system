@@ -1,6 +1,9 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -21,7 +24,8 @@ function MyOrders() {
       const user = JSON.parse(
         localStorage.getItem("user") || "null"
       );
-console.log("Logged in user:", user);
+
+      console.log("Logged in user:", user);
 
       if (!user?.email) {
         setError(
@@ -32,7 +36,7 @@ console.log("Logged in user:", user);
 
       // 1. Get all customers
       const customerResponse = await axios.get(
-        "http://127.0.0.1:8001/customers/"
+        `${API_URL}/customers/`
       );
 
       const customers = customerResponse.data || [];
@@ -54,7 +58,7 @@ console.log("Logged in user:", user);
 
       // 3. Get all orders
       const ordersResponse = await axios.get(
-        "http://127.0.0.1:8001/orders/"
+        `${API_URL}/orders/`
       );
 
       const allOrders = ordersResponse.data || [];
