@@ -32,8 +32,9 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
+   allow_origins=[
     "https://food-ordering-system-seven-snowy.vercel.app",
+    "https://foodie-darmii.vercel.app",
 
     "http://localhost:5180",
     "http://127.0.0.1:5180",
